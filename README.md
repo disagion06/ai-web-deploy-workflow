@@ -675,6 +675,28 @@ GitHub Pages 默认会用 Jekyll 处理你推送的内容，而 **Jekyll 会忽�
 
 界面第 5 步的「查看构建日志」按钮会直接打开该仓库的 Actions 页面。
 
+### Q14：`git push` 报 `schannel: AcquireCredentialsHandle failed` 或「Connection was reset」怎么办？
+
+这是**本机网络 / TLS 后端**的问题，不是程序的问题。按顺序试：
+
+| 现象 | 原因 | 处理 |
+| --- | --- | --- |
+| `schannel: AcquireCredentialsHandle failed: SEC_E_NO_CREDENTIALS` | 系统 TLS 后端（schannel）在受限环境里拿不到凭据句柄 | 换 OpenSSL 后端：`git -c http.sslBackend=openssl push`。`lib/deploy.js` 已内置这条降级，会自动重试 |
+| 换后端后报 `Recv failure: Connection was reset` / `Could not connect to github.com:443` | `github.com:443` 的网络路径不通（国内常见），但 `api.github.com` 往往是通的 | 用 GitHub REST 的 **Git Data API** 推送绕过 git 协议（见下） |
+
+判断到底是哪种：`Test-NetConnection github.com -Port 443` 与 `gh api rate_limit` 分别测一下。
+**如果 `gh api` 能通、但 `github.com:443` 不通**，那么创建仓库、开 Pages、查构建状态全都能走 API，只有 `git push` 不行。
+
+这种情况下的推送思路（本项目实测过）：
+
+1. `POST /repos/{owner}/{repo}/git/blobs` 逐个上传文件（base64）
+2. `POST /repos/{owner}/{repo}/git/trees` 用上一步的 blob sha 组装整棵树
+3. `POST /repos/{owner}/{repo}/git/commits` 创建提交（空仓库要先用 Contents API 落一次初始提交，否则会出现
+   `409 Git Repository is empty`，因为空仓库不允许直接创建 blob）
+4. `PATCH /repos/{owner}/{repo}/git/refs/heads/main` 把分支指过去
+
+> 注意：`git ls-files` 默认会把中文路径转义成 `\344\275\277...`，喂给 API 前要加 `-c core.quotepath=false`。
+
 ### Q11：会不会修改我的原始设计稿？
 
 不会。扫描是只读的；生成阶段是把站点**复制**到工作区后再改写；上线推送的是复制出来的那份。唯一会写文件的例外是你手动点「打开目录」后自己去改。
