@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>设计稿上线助手 · 一句话生成网页 → 自动脱敏 → 一键上线</title>
+<meta name="description" content="AI 生成网页之后，自动扫出手机号、邮箱、身份证、照片 GPS 并逐项处理，再一键上线到 GitHub Pages。">
+<style>
+  :root {
+    --bg: #f7f5f0;
+    --panel: #ffffff;
+    --ink: #1b1f27;
+    --muted: #5f6673;
+    --line: #dcd7cd;
+    --accent: #b3261e;
+    --accent-soft: #f6e6e4;
+    --ok: #1f7a3d;
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161a;
+      --panel: #1b1e24;
+      --ink: #e8e6e1;
+      --muted: #9aa1ad;
+      --line: #2c313a;
+      --accent: #ff7b6b;
+      --accent-soft: #2a1e1d;
+      --ok: #66d19e;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.72 -apple-system, "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+  }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 0 22px; }
+
+  header { border-bottom: 1px solid var(--line); background: var(--panel); }
+  header .wrap { padding-top: 46px; padding-bottom: 42px; text-align: center; }
+  .kicker { font: 600 12px/1 var(--mono); letter-spacing: .22em; color: var(--accent); text-transform: uppercase; }
+  h1 { font-size: clamp(26px, 5vw, 42px); line-height: 1.25; margin: 16px 0 14px; letter-spacing: -.02em; }
+  .lede { max-width: 640px; margin: 0 auto; color: var(--muted); font-size: 17px; }
+  .rule { width: 54px; height: 3px; background: var(--accent); margin: 22px auto 0; }
+
+  section { padding: 46px 0; border-bottom: 1px solid var(--line); }
+  section:last-of-type { border-bottom: 0; }
+  h2 { font-size: 15px; font-family: var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin: 0 0 22px; }
+  h3 { font-size: 17px; margin: 0 0 8px; }
+
+  .pipeline { display: grid; gap: 10px; }
+  .step {
+    display: grid; grid-template-columns: 30px 1fr; gap: 14px; align-items: start;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+  }
+  .step .n { font: 700 13px/1 var(--mono); color: var(--accent); padding-top: 4px; }
+  .step p { margin: 0; color: var(--muted); font-size: 14px; }
+  .step.is-new { border-color: var(--accent); background: var(--accent-soft); }
+  .badge { display: inline-block; font: 600 10px/1 var(--mono); letter-spacing: .1em; padding: 3px 6px; border-radius: 3px; background: var(--accent); color: #fff; vertical-align: 2px; margin-left: 6px; }
+
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+  .stat b { display: block; font: 700 26px/1.1 var(--mono); color: var(--accent); }
+  .stat span { display: block; margin-top: 6px; font-size: 13px; color: var(--muted); }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font: 600 12px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  td code, p code, li code { font-family: var(--mono); font-size: 13px; background: var(--accent-soft); padding: 1px 5px; border-radius: 3px; }
+
+  pre { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; overflow-x: auto; margin: 0 0 14px; }
+  pre code { font-family: var(--mono); font-size: 13px; background: none; padding: 0; }
+  .cmt { color: var(--muted); }
+  ul { margin: 0 0 14px; padding-left: 1.25em; }
+  li { margin-bottom: 6px; }
+  a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; }
+  a:hover { border-bottom-color: var(--accent); }
+
+  footer { padding: 34px 0 52px; color: var(--muted); font-size: 13px; text-align: center; }
+  .note { font-size: 13px; color: var(--muted); border-left: 3px solid var(--accent); padding-left: 12px; margin-top: 16px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="kicker">DesignDeployer</div>
+    <h1>一句话生成网页<br>自动脱敏，一键上线</h1>
+    <p class="lede">
+      「AI 生成网页」的 demo 满大街都是，但没有一个管生成结果的隐私。
+      AI 做出来的个人主页里，常常带着你喂给它的真实手机号、邮箱、照片 GPS。
+      这个工具在生成之后就接管：扫一遍、你逐项决定、改写后再自检一遍、上线后抓真实链接复核一遍。
+    </p>
+    <div class="rule"></div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <h2>整条流水线</h2>
+    <div class="pipeline">
+      <div class="step is-new">
+        <div class="n">01</div>
+        <div><h3>生成网页 <span class="badge">新增</span></h3>
+        <p>一句话描述需求 → 区块规划 → 分块生成 → 确定性组装。AI 只产出区块片段，骨架和拼装是代码，所以单块失败只坏一块、可单独重做。</p></div>
+      </div>
+      <div class="step">
+        <div class="n">02</div>
+        <div><h3>扫描敏感信息</h3>
+        <p>21 条规则：手机号、邮箱、身份证、银行卡（含 Luhn 校验）、QQ、微信、中文姓名（能识别被标签拆开的姓名）、出生年月、详细住址、学号、密钥、学校、公司、城市、社交账号，外加图片 EXIF / GPS / 人像识别。</p></div>
+      </div>
+      <div class="step">
+        <div class="n">03</div>
+        <div><h3>逐项选择</h3>
+        <p>打码 / 删除 / 隐藏整块 / 保留，带打码效果预览与「文件:行:列」命中位置。图片是模糊 / 删除 / 保留。</p></div>
+      </div>
+      <div class="step">
+        <div class="n">04</div>
+        <div><h3>脱敏生成并自检</h3>
+        <p>文本改写、删空条目整块隐藏、图片马赛克并剥离 EXIF/GPS、摘除被排除文件的引用、写 <code>.nojekyll</code>，然后对生成结果再扫一遍自检。</p></div>
+      </div>
+      <div class="step">
+        <div class="n">05</div>
+        <div><h3>上线 GitHub Pages</h3>
+        <p>git init / commit → 建库 → push → 开 Pages → 轮询构建 → 强制 HTTPS → 抓真实链接复核敏感值是否消失 → 输出链接。</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>可复现的验证</h2>
+    <div class="stats">
+      <div class="stat"><b>125</b><span>契约一致性检查<br>0 问题</span></div>
+      <div class="stat"><b>46</b><span>端到端冒烟断言<br>0 失败</span></div>
+      <div class="stat"><b>29</b><span>模型适配器断言<br>0 失败</span></div>
+      <div class="stat"><b>0</b><span>源码中的真实<br>个人信息</span></div>
+    </div>
+    <p class="note">
+      冒烟测试用的是运行时生成的<b>全合成</b>测试站（假手机号、假人像、52MB 稀疏视频、<code>_</code> 目录、误报陷阱），
+      不依赖任何一台机器的路径，也不含真实个人信息 —— 任何人克隆下来都能跑通。
+      模型适配器测试起一个本地假模型服务器，验证 429 重试、401 不重试、SSE 流式、主备降级与成本计量。
+    </p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>素材规整的五条硬约束</h2>
+    <p style="color:var(--muted);font-size:14px;margin-top:0">
+      这些是手工实操时真踩过坑才发现的知识，现在固化成程序里的确定性检查。
+    </p>
+    <table>
+      <thead><tr><th>编号</th><th>约束</th><th>不遵守会怎样</th></tr></thead>
+      <tbody>
+        <tr><td>C1</td><td>素材文件名必须 ASCII / 拼音</td><td>发布后裂图</td></tr>
+        <tr><td>C2</td><td>视频必须是 H.264</td><td>HEVC 浏览器播不了（手写 MP4 box 解析探测）</td></tr>
+        <tr><td>C3</td><td>PSD / AEP 不能直接展示</td><td>需先导出预览图</td></tr>
+        <tr><td>C4</td><td>视频要抽首帧做封面</td><td>灯箱黑屏</td></tr>
+        <tr><td>C5</td><td>图片必须写死静态 <code>src</code></td><td>靠 JS 注入会在发布后裂图</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>怎么跑起来</h2>
+    <pre><code><span class="cmt"># 1. 装依赖（Electron 只作桌面外壳，运行时零第三方依赖）</span>
+npm install
+
+<span class="cmt"># 2. 图形界面</span>
+npm start
+
+<span class="cmt"># 3. 命令行一条龙：生成 → 脱敏 →（可选）上线</span>
+npm run cli -- make .work/my-site --brief "个人作品集单页，含作品列表与联系方式"
+
+<span class="cmt"># 4. 换成真模型（不配则用内置 mock，无需任何 key 也能跑通全流程）</span>
+set DEEPSEEK_API_KEY=sk-...
+npm run cli -- make .work/my-site --brief "个人作品集" --provider deepseek --model deepseek-chat</code></pre>
+    <ul>
+      <li>图形界面第 1 步有「AI 生成网页 / 已有设计稿」两个入口，生成完可直接跳进脱敏。</li>
+      <li>模型可插拔：mock / DeepSeek / 火山方舟豆包 / 通义 / Kimi / OpenAI / Claude，统一走 OpenAI 兼容格式。</li>
+      <li>API key 只从环境变量或用户目录配置读取，<b>不入日志、不落仓库</b>。</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2>文档</h2>
+    <ul>
+      <li><a href="./使用说明.md">使用说明</a> —— 面向第一次用的人，每步点哪里</li>
+      <li><a href="./网页制作流程.md">网页制作流程</a> —— 从手工实操提炼的九阶段规格、C1–C9 硬约束、六维评审 rubric</li>
+      <li><a href="./IPC_CONTRACT.md">接口契约</a> —— 渲染层与主进程之间冻结的通道、返回结构、错误码</li>
+      <li><a href="../README.md">README</a> —— 完整工程文档：原理、FAQ、局限、验证记录</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    设计稿上线助手 · 生成的页面只在你自己的电脑上处理，只有你点「开始上线」才会推送到你自己的仓库。
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,90 @@
+{
+  "name": "design-deployer",
+  "productName": "设计稿上线助手",
+  "version": "1.0.0",
+  "description": "把本地设计稿（HTML 站点）脱敏、建库并一键上线到 GitHub Pages 的桌面程序",
+  "main": "electron/main.js",
+  "author": "毕业设计",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "cli": "node bin/dd-cli.cjs",
+    "smoke": "node scripts/smoke.cjs",
+    "check": "node scripts/check-contract.cjs",
+    "test:llm": "node scripts/test-llm.cjs",
+    "verify:online": "node scripts/verify-online.cjs",
+    "scan": "node scripts/test-scan.cjs",
+    "build:test": "node scripts/test-build.cjs",
+    "icon": "node scripts/make-icon.cjs",
+    "ui": "electron scripts/ui-drive.cjs",
+    "dist": "npm run icon && electron-builder --win nsis portable",
+    "dist:installer": "npm run icon && electron-builder --win nsis",
+    "dist:portable": "npm run icon && electron-builder --win portable",
+    "dist:dir": "electron-builder --win --dir",
+    "postinstall": "node scripts/chmod-note.cjs"
+  },
+  "devDependencies": {
+    "electron": "^44.7.0",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "com.graduation.design-deployer",
+    "productName": "设计稿上线助手",
+    "copyright": "Copyright © 2026 设计稿上线助手",
+    "npmRebuild": false,
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "electron/**/*",
+      "lib/**/*",
+      "src/**/*",
+      "bin/**/*",
+      "docs/**/*",
+      "README.md",
+      "package.json"
+    ],
+    "win": {
+      "icon": "build/icon.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": false,
+      "createStartMenuShortcut": true,
+      "shortcutName": "设计稿上线助手",
+      "menuCategory": false,
+      "runAfterFinish": true,
+      "deleteAppDataOnUninstall": false,
+      "include": "build/installer.nsh",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerHeaderIcon": "build/icon.ico",
+      "artifactName": "设计稿上线助手-安装包-${version}.${ext}",
+      "uninstallDisplayName": "设计稿上线助手 ${version}"
+    },
+    "portable": {
+      "unicode": true,
+      "artifactName": "设计稿上线助手-便携版-${version}.${ext}"
+    }
+  }
+}

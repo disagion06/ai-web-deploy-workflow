@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: file:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'" />
+  <title>设计稿上线助手</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app" id="app">
+
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-logo" aria-hidden="true">DD</div>
+        <div class="brand-text">
+          <div class="brand-title">设计稿上线助手</div>
+          <div class="brand-sub" id="brandVersion">正在启动…</div>
+        </div>
+      </div>
+
+      <nav class="stepbar" id="stepbar" aria-label="上线向导步骤"></nav>
+
+      <div class="topbar-side">
+        <div class="chip" id="siteChip" title="当前导入的站点">未导入站点</div>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <main class="content step-1" id="stepBody" tabindex="-1"></main>
+
+      <aside class="sidebar" aria-label="环境与插件">
+        <section class="panel">
+          <div class="panel-head">
+            <h2 class="panel-title">环境与插件</h2>
+            <button type="button" class="btn btn-ghost btn-xs" id="btnRecheck">重新检测</button>
+          </div>
+          <div class="tools-list" id="toolsList"></div>
+          <div class="panel-foot small muted" id="toolsHint">
+            首次使用会自动安装缺失的插件（含图片打码插件 sharp），无需手动操作。
+          </div>
+        </section>
+      </aside>
+    </div>
+
+    <footer class="footer">
+      <div class="footer-hint" id="footerHint">拖入包含 index.html 的文件夹即可开始</div>
+      <div class="footer-actions">
+        <button type="button" class="btn" id="btnBack">上一步</button>
+        <button type="button" class="btn btn-primary" id="btnNext">下一步</button>
+      </div>
+    </footer>
+
+    <div class="toast-host" id="toastHost" aria-live="polite" aria-atomic="false"></div>
+
+    <div class="fatal hidden" id="fatal" role="alertdialog" aria-modal="true">
+      <div class="fatal-card">
+        <div class="fatal-icon" aria-hidden="true">!</div>
+        <h2 class="fatal-title">界面无法启动</h2>
+        <p class="fatal-msg" id="fatalMsg"></p>
+        <p class="fatal-sub">本界面只能运行在 Electron 桌面程序中（需要 window.dd 桥接）。</p>
+      </div>
+    </div>
+
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
