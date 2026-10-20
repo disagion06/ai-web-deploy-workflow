@@ -1,0 +1,28 @@
+# 依赖与构建产物
+node_modules/
+dist/
+.npmcache/
+.builder-cache/
+builder.log
+
+# 程序运行时产生的东西
+.work/
+.tools/
+.electron-cache/
+.electron-userdata/
+.localappdata/
+shots/
+启动日志.txt
+诊断报告.txt
+打包日志.txt
+
+# 系统
+Thumbs.db
+.DS_Store
+*.log
+
+# 内部笔记（本地保留，不随仓库公开）
+# 交接文档是写给「下一个接手的 AI 会话」的内部状态笔记，含本机绝对路径与开发细节
+交接文档.md
+# 求职向的改造方案，含个人定位分析；想公开就删掉这一行
+作品集改造方案.md
