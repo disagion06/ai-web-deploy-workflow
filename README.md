@@ -8,6 +8,11 @@
 > **为什么还要脱敏？** AI 生成的个人主页里，大概率带着你喂给它的真实手机号、邮箱、照片 GPS。
 > 本项目在生成之后立刻接管：21 条规则扫一遍 → 你逐项决定 → 改写后再自检一遍 → 上线后抓真实链接复核一遍。
 
+> **只想装在 AI 里用？** 如果你用的是 Claude Code / Cursor 这类支持 Agent Skill 的客户端，
+> 可以直接装配套的 skill：[`personal-homepage-skill`](https://github.com/disagion06/personal-homepage-skill)。
+> 那个 skill 由**宿主 AI 自己写 HTML**，不需要模型 API key；本仓库则是完整的桌面程序 + CLI，
+> 自带程序内调模型生成网页的能力。
+
 ---
 
 ## 一、项目简介
